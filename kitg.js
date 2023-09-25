@@ -20,8 +20,6 @@ var spcOrbitalArray = gamePage.space.meta[4].meta[1];
 var proVar = gamePage.resPool.energyProd;
 var conVar = gamePage.resPool.energyCons;
 var FreeEnergy = 0;
-var deadScript = "Script is dead";
-var Iinc = 0;
 var IincKAssign = 0;
 var tick = 0;
 var tick_inactive = 0;
@@ -82,7 +80,7 @@ var htmlMenuAddition = '<div id="farRightColumn" class="column">' +
 '<div id="optionSelect" style="display:none; margin-top:-235px; margin-left:-60px; width:200px" class="dialog help">' +
 '<a href="#" onclick="clearOptionHelpDiv();" style="position: absolute; top: 10px; right: 15px;">close</a>' +
 
-'<button id="killSwitch" onclick="clearInterval(clearScript()); gamePage.msg(deadScript);">Kill Switch</button> </br>' +
+'<button id="killSwitch" onclick="clearInterval(clearScript()); gamePage.msg(\'Script is dead\');">Kill Switch</button> </br>' +
 '<hr size=5>' +
 '<button id="autoEnergy" style="color:black" onclick="autoSwitch(\'Energy Control\',  \'autoEnergy\')"> Energy Control </button></br>' +
 '<hr size=3>' +
@@ -129,15 +127,6 @@ function autoSwitch(varCheck, varName) {
 
 
 /* These are the functions which are controlled by the runAllAutomation timer */
-
-// Auto Observe Astronomical Events
-function autoObserve() {
-		var checkObserveBtn = document.getElementById("observeBtn");
-		if (typeof(checkObserveBtn) != 'undefined' && checkObserveBtn != null) {
-			document.getElementById('observeBtn').click();
-		}
-}
-
 
 //Auto praise the sun
 function autoPraise(){
@@ -1776,56 +1765,66 @@ gamePage.tabs.filter(tab => tab.tabId != "Stats" ).forEach(tab => tab.render());
 // This function keeps track of the game's ticks and uses math to execute these functions at set times relative to the game.
 gamePage.ui.render();
 
-var runAllAutomation = setInterval(function() {
-    if (tick != gamePage.timer.ticksTotal) {
-        tick = gamePage.timer.ticksTotal;
-        setTimeout(autoBuild, 2);
-        setTimeout(autoNip, 0);
-        setTimeout(autoRefine, 1);
-        setTimeout(LabelMsg, 0);
+var runAllAutomation = setInterval(() => {
+    if (tick == gamePage.timer.ticksTotal) { return; }
 
-        if (gamePage.timer.ticksTotal % 3 === 0) {
-            setTimeout(autoObserve, 0);
-            setTimeout(autoCraft2, 1);
-            setTimeout(autoAssign, 0);
-            gamePage.villageTab.updateTab();
-        }
+    tick = gamePage.timer.ticksTotal;
+    setTimeout(autoBuild, 2);
+    setTimeout(autoNip, 0);
+    setTimeout(autoRefine, 1);
+    setTimeout(LabelMsg, 0);
 
-        if (gamePage.timer.ticksTotal % 10 === 0) {
-            setTimeout(autoSpace, 1);
-        }
+    if (tick % 3 === 0) {
+        setTimeout(autoCraft2, 1);
+        setTimeout(autoAssign, 0);
+        gamePage.villageTab.updateTab();
+    }
 
-        if (gamePage.timer.ticksTotal % 25 === 0) {
-             setTimeout(energyControl, 0);
-             setTimeout(autoParty, 0);
-             setTimeout(autoTrade, 1);
-             setTimeout(autoResearch, 2);
-             setTimeout(autoWorkshop, 2);
-             setTimeout(autoPraise, 2);
-             setTimeout(autoHunt, 3);
+    if (tick % 10 === 0) {
+        setTimeout(autoSpace, 1);
+    }
 
-        }
+    if (tick % 25 === 0) {
+        setTimeout(energyControl, 0);
+        setTimeout(autoParty, 0);
+        setTimeout(autoTrade, 1);
+        setTimeout(autoResearch, 2);
+        setTimeout(autoWorkshop, 2);
+        setTimeout(autoPraise, 2);
+        setTimeout(autoHunt, 3);
+    }
 
-        if (gamePage.timer.ticksTotal % 30 === 0) {
-             setTimeout(Timepage, 0);
-        }
+    if (tick % 30 === 0) {
+        setTimeout(Timepage, 0);
+    }
 
-         if (gamePage.timer.ticksTotal % 50 === 0) {
-             setTimeout(ResearchSolarRevolution, 0);
-             setTimeout(UpgradeBuildings, 1);
+    if (tick % 50 === 0) {
+        setTimeout(ResearchSolarRevolution, 0);
+        setTimeout(UpgradeBuildings, 1);
+    }
 
-        }
+    if (tick % 151 === 0) {
+        setTimeout(RenderNewTabs, 1);
+    }
 
-        if (gamePage.timer.ticksTotal % 151 === 0) {
-            setTimeout(RenderNewTabs, 1);
-            if (Iinc == 5) {
-                setTimeout(autozig, 0);
-                setTimeout(Service, 2);
-                Iinc = 0;
-            }
-            Iinc++;
-        }
+    if (tick % 755 === 0) {
+        setTimeout(autozig, 0);
+        setTimeout(Service, 2);
     }
 
 }, 50);
 
+/* These are the functions which are controlled by yourself  */
+
+// Auto Observe Astronomical Events
+function autoObserve() {
+    if (game.workshop.get('seti').researched) { return; }
+    var checkObserveBtn = document.getElementById("observeBtn");
+    if (typeof(checkObserveBtn) != 'undefined' && checkObserveBtn != null) {
+        document.getElementById('observeBtn').click();
+    }
+
+    setTimeout(autoObserve, 2000);
+}
+
+autoObserve();
